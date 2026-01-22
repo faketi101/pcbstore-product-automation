@@ -332,19 +332,16 @@ const ReportHistory = ({ onEdit, lastEditedReportId, onClearLastEdited }) => {
                         </span>
                       ) : null;
                     }
-                    // Ensure value is an object before calculating total
+                    // Ensure value is an object before formatting
                     if (!value || typeof value !== "object") return null;
 
-                    const total = Object.values(value).reduce(
-                      (a, b) => (a || 0) + (b || 0),
-                      0,
-                    );
-                    return total > 0 ? (
+                    const formatted = formatParts(value);
+                    return formatted ? (
                       <span
                         key={key}
                         className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
                       >
-                        {key}: {total}
+                        {capitalize(key)}: {formatted}
                       </span>
                     ) : null;
                   })}

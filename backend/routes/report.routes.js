@@ -309,12 +309,21 @@ router.put("/hourly/:id", verifySession, async (req, res) => {
       return res.status(404).json({ message: "Report not found." });
     }
 
-    // Update the report data
-    user.reports[reportIndex] = {
+    // Update the report data and timestamp to maintain correct sort order
+    const updatedReport = {
       ...user.reports[reportIndex],
       ...req.body,
       id: req.params.id, // Preserve the original ID
     };
+
+    // Update timestamp based on date and time
+    if (updatedReport.date && updatedReport.time) {
+      updatedReport.timestamp = new Date(
+        `${updatedReport.date}T${updatedReport.time}:00`,
+      ).toISOString();
+    }
+
+    user.reports[reportIndex] = updatedReport;
 
     await user.save();
 
