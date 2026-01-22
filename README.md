@@ -1,4 +1,4 @@
-# PCB Automotions
+# PCB Product Automotions
 
 A comprehensive production-ready web application for managing PCB (Printed Circuit Board) automation reports and user management. Built with modern web technologies for reliable performance and scalability.
 
@@ -260,4 +260,4 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 ---
 
-**Built with ❤️ for efficient PCB Product automation management by TARIKUL ISLAM**
+**Built with ❤️ for efficient PCB Store Product automation management by TARIKUL ISLAM**
