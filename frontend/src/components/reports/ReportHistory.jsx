@@ -70,7 +70,7 @@ const ReportHistory = ({ onEdit, lastEditedReportId, onClearLastEdited }) => {
 
     addLine("Description", data.description || {});
     addLine("FAQ", data.faq || {});
-    addLine("Key Features", data.keyFeatures || data.keywords || {});
+    addLine("Key Features", data.keywords || data.keyFeatures || {});
     addLine("Specifications", data.specifications || {});
     addLine("Meta Title & Description", data.metaTitleDescription || {});
     addLine("Title", data.titleFixed || {});
@@ -99,102 +99,6 @@ const ReportHistory = ({ onEdit, lastEditedReportId, onClearLastEdited }) => {
     return text;
   };
 
-  // old ones
-
-  // const formatHourlyReportForWhatsApp = (report) => {
-  //   let text = `*Hourly Report*\n`;
-  //   text += `Products:\n`;
-
-  //   const data = report.data;
-  //   let hasData = false;
-
-  //   if (
-  //     data.description &&
-  //     (data.description.generated > 0 || data.description.added > 0)
-  //   ) {
-  //     text += `- Description: Generated ${data.description.generated}, Added ${data.description.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.faq && (data.faq.generated > 0 || data.faq.added > 0)) {
-  //     text += `- FAQ: Generated ${data.faq.generated}, Added ${data.faq.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (
-  //     data.keywords &&
-  //     (data.keywords.generated > 0 || data.keywords.added > 0)
-  //   ) {
-  //     text += `- Keywords: Generated ${data.keywords.generated}, Added ${data.keywords.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (
-  //     data.specifications &&
-  //     (data.specifications.generated > 0 || data.specifications.added > 0)
-  //   ) {
-  //     text += `- Specifications: Generated ${data.specifications.generated}, Added ${data.specifications.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (
-  //     data.metaTitleDescription &&
-  //     (data.metaTitleDescription.generated > 0 ||
-  //       data.metaTitleDescription.added > 0)
-  //   ) {
-  //     text += `- Meta Title & Description: Generated ${data.metaTitleDescription.generated}, Added ${data.metaTitleDescription.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (
-  //     data.titleFixed &&
-  //     (data.titleFixed.fixed > 0 || data.titleFixed.added > 0)
-  //   ) {
-  //     text += `- Title: Fixed ${data.titleFixed.fixed}, Added ${data.titleFixed.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.imageRenamed && data.imageRenamed.fixed > 0) {
-  //     text += `- Image Renamed & Fixed: ${data.imageRenamed.fixed}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.category && data.category.added > 0) {
-  //     text += `- Category: Added ${data.category.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.attributes && data.attributes.added > 0) {
-  //     text += `- Attributes: Added ${data.attributes.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.deliveryCharge && data.deliveryCharge.added > 0) {
-  //     text += `- Delivery Charge: Added ${data.deliveryCharge.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.warranty && data.warranty.added > 0) {
-  //     text += `- Warranty: Added ${data.warranty.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.warrantyClaimReasons && data.warrantyClaimReasons.added > 0) {
-  //     text += `- Warranty Claim Reasons: Added ${data.warrantyClaimReasons.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.brand && data.brand.added > 0) {
-  //     text += `- Brand: Added ${data.brand.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.price && data.price.added > 0) {
-  //     text += `- Price: Added ${data.price.added}\n`;
-  //     hasData = true;
-  //   }
-  //   if (data.customFields && data.customFields.length > 0) {
-  //     data.customFields.forEach((field) => {
-  //       if (field.value > 0) {
-  //         text += `- ${field.name}: ${field.value}\n`;
-  //         hasData = true;
-  //       }
-  //     });
-  //   }
-
-  //   if (!hasData) {
-  //     text += `No data recorded\n`;
-  //   }
-
-  //   return text;
-  // };
 
   const copyHourlyReportToClipboard = (report) => {
     const text = formatHourlyReportForWhatsApp(report);

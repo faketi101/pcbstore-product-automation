@@ -15,10 +15,10 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
 
   const getInitialFormData = () => {
     if (editingReport) {
-      // Handle migration from old 'keywords' field to 'keyFeatures'
+      // Handle migration from old 'keyFeatures' field to 'keyFeatures'
       const data = editingReport.data;
       const keyFeatures = data.keyFeatures ||
-        data.keywords || { generated: 0, added: 0 };
+        data.keyFeatures || { generated: 0, added: 0 };
 
       return {
         date: editingReport.date,
@@ -33,10 +33,10 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
-        // Handle migration from old 'keywords' field to 'keyFeatures'
-        if (parsedData.keywords && !parsedData.keyFeatures) {
-          parsedData.keyFeatures = parsedData.keywords;
-          delete parsedData.keywords;
+        // Handle migration from old 'keyFeatures' field to 'keyFeatures'
+        if (parsedData.keyFeatures && !parsedData.keyFeatures) {
+          parsedData.keyFeatures = parsedData.keyFeatures;
+          delete parsedData.keyFeatures;
         }
         // Ensure keyFeatures exists
         if (!parsedData.keyFeatures) {
@@ -118,7 +118,7 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
       time: `${new Date().getHours().toString().padStart(2, "0")}:00`,
       description: { generated: 0, added: 0 },
       faq: { generated: 0, added: 0 },
-      keywords: { generated: 0, added: 0 },
+      keyFeatures: { generated: 0, added: 0 },
       specifications: { generated: 0, added: 0 },
       metaTitleDescription: { generated: 0, added: 0 },
       titleFixed: { fixed: 0, added: 0 },
