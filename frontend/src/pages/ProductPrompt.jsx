@@ -97,6 +97,7 @@ const ProductPrompt = () => {
     Object.keys(replacements).forEach((key) => {
       // Create a regex that searches for the literal key globally
       // Escape the $ and { } for regex
+      // eslint-disable-next-line no-useless-escape
       const escapedKey = key.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
       generated = generated.replace(
         new RegExp(escapedKey, "g"),
