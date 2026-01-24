@@ -89,6 +89,8 @@ const formatReportForWhatsApp = (reportData, type = "hourly", date = "") => {
     lines.push(`- warranty added ${data.warranty.added}`);
   if (data.brand?.added > 0) lines.push(`- brand added ${data.brand.added}`);
   if (data.price?.added > 0) lines.push(`- price added ${data.price.added}`);
+  if (data.internalLink?.added > 0)
+    lines.push(`- internal link added ${data.internalLink.added}`);
 
   if (data.customFields?.length) {
     data.customFields.forEach((field) => {
@@ -123,6 +125,7 @@ const aggregateDailyReport = (hourlyReports) => {
     warranty: { added: 0 },
     brand: { added: 0 },
     price: { added: 0 },
+    internalLink: { added: 0 },
     customFields: [],
   };
 

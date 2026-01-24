@@ -45,17 +45,47 @@ const DateRangeReport = () => {
         warranty: { added: 0 },
         brand: { added: 0 },
         price: { added: 0 },
+        internalLink: { added: 0 },
+        customFields: [],
       };
 
       response.reports.forEach((report) => {
         const data = report.data;
         Object.keys(aggregated).forEach((key) => {
+          if (key === "customFields") return;
           if (data[key]) {
             Object.keys(data[key]).forEach((subKey) => {
               aggregated[key][subKey] += data[key][subKey] || 0;
             });
           }
         });
+
+        // Aggregate custom fields
+        if (data.customFields?.length) {
+          const customFieldsMap = new Map();
+
+          // First, collect existing aggregated custom fields
+          aggregated.customFields.forEach((field) => {
+            customFieldsMap.set(field.name, field.value);
+          });
+
+          // Then, add values from current report
+          data.customFields.forEach((field) => {
+            customFieldsMap.set(
+              field.name,
+              (customFieldsMap.get(field.name) || 0) + field.value,
+            );
+          });
+
+          // Convert back to array
+          aggregated.customFields = Array.from(
+            customFieldsMap,
+            ([name, value]) => ({
+              name,
+              value,
+            }),
+          );
+        }
       });
 
       setAggregatedData(aggregated);
@@ -112,6 +142,17 @@ const DateRangeReport = () => {
       text += `- brand: added ${aggregatedData.brand.added}\n`;
     if (aggregatedData.price?.added > 0)
       text += `- price: added ${aggregatedData.price.added}\n`;
+    if (aggregatedData.internalLink?.added > 0)
+      text += `- internal link: added ${aggregatedData.internalLink.added}\n`;
+
+    // Add custom fields
+    if (aggregatedData.customFields?.length > 0) {
+      aggregatedData.customFields.forEach((field) => {
+        if (field.value > 0) {
+          text += `- ${field.name}: ${field.value}\n`;
+        }
+      });
+    }
 
     return text;
   };

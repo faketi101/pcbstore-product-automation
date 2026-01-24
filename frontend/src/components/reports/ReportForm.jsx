@@ -25,6 +25,7 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
         time: editingReport.time,
         ...data,
         keyFeatures: keyFeatures,
+        internalLink: data.internalLink || { added: 0 },
       };
     }
 
@@ -42,6 +43,10 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
         // Ensure keyFeatures exists
         if (!parsedData.keyFeatures) {
           parsedData.keyFeatures = { generated: 0, added: 0 };
+        }
+        // Ensure internalLink exists
+        if (!parsedData.internalLink) {
+          parsedData.internalLink = { added: 0 };
         }
         // Ensure customFields exists and is an array
         if (
@@ -78,6 +83,7 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
       warrantyClaimReasons: { added: 0 },
       brand: { added: 0 },
       price: { added: 0 },
+      internalLink: { added: 0 },
       customFields: [],
     };
   };
@@ -157,6 +163,7 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
       warrantyClaimReasons: { added: 0 },
       brand: { added: 0 },
       price: { added: 0 },
+      internalLink: { added: 0 },
       customFields: [],
     };
     setFormData(emptyForm);
@@ -189,6 +196,7 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
           warrantyClaimReasons: formData.warrantyClaimReasons,
           brand: formData.brand,
           price: formData.price,
+          internalLink: formData.internalLink,
           customFields: formData.customFields,
         },
       };
@@ -393,6 +401,15 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
         fields={["added"]}
         values={formData.price}
         onChange={(field, value) => handleFieldChange("price", field, value)}
+      />
+
+      <FieldGroup
+        label="Internal Link"
+        fields={["added"]}
+        values={formData.internalLink}
+        onChange={(field, value) =>
+          handleFieldChange("internalLink", field, value)
+        }
       />
 
       <CustomFieldsSection
