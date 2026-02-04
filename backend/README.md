@@ -248,6 +248,41 @@ You'll need to create an admin interface or use MongoDB Compass/CLI to add new u
 - Check minimum length requirement (6 chars)
 - Verify user is authenticated
 
+## Production Deployment
+
+### cPanel / Cloud Hosting
+
+**See [DEPLOYMENT_TROUBLESHOOTING.md](../DEPLOYMENT_TROUBLESHOOTING.md) for detailed troubleshooting guide.**
+
+**Required Environment Variables:**
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
+SESSION_SECRET=strong-random-secret-at-least-32-chars
+NODE_ENV=production
+FRONTEND_URL=https://yourdomain.com
+COOKIE_SECURE=true
+```
+
+**Important Steps:**
+1. Set all environment variables in cPanel Node.js App settings
+2. Whitelist your server's IP in MongoDB Atlas
+3. Use MongoDB Atlas (not localhost)
+4. Set `NODE_ENV=production`
+5. Generate strong `SESSION_SECRET`
+6. Match `FRONTEND_URL` to your actual domain
+
+**Health Check:**
+Visit `/api/health` to verify configuration:
+```bash
+curl https://pcbserver.tarikul.dev/api/health
+```
+
+**Common Issues:**
+- 500 Error on login → Check MongoDB connection and SESSION_SECRET
+- CORS errors → Verify FRONTEND_URL matches exactly
+- Session not saving → Check MongoDB connection for session store
+
 ## License
 
 ISC

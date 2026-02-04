@@ -10,23 +10,40 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log("Login attempt for:", email);
+
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: "Email and password are required." });
     }
 
+    // Check database connection
+    const mongoose = require("mongoose");
+    if (mongoose.connection.readyState !== 1) {
+      console.error(
+        "MongoDB not connected. State:",
+        mongoose.connection.readyState,
+      );
+      return res.status(503).json({ message: "Database connection error." });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
+      console.log("User not found:", email);
       return res.status(404).json({ message: "User not found." });
     }
 
+    console.log("User found, comparing password...");
     const passwordIsValid = await user.comparePassword(password);
 
     if (!passwordIsValid) {
+      console.log("Invalid password for user:", email);
       return res.status(401).json({ message: "Invalid password." });
     }
+
+    console.log("Password valid, creating session...");
 
     // Set session
     req.session.userId = user._id.toString();
@@ -37,9 +54,18 @@ router.post("/login", async (req, res) => {
     req.session.save((err) => {
       if (err) {
         console.error("Session save error:", err);
-        return res.status(500).json({ message: "Failed to create session." });
+        console.error(
+          "Session save error details:",
+          JSON.stringify(err, null, 2),
+        );
+        return res.status(500).json({
+          message: "Failed to create session.",
+          error:
+            process.env.NODE_ENV === "development" ? err.message : undefined,
+        });
       }
 
+      console.log("Login successful for:", email);
       res.status(200).json({
         id: user._id,
         name: user.name,
@@ -50,7 +76,12 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Internal server error during login." });
+    console.error("Login error stack:", error.stack);
+    res.status(500).json({
+      message: "Internal server error during login.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
   }
 });
 

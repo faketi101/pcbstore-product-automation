@@ -69,15 +69,25 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session configuration
+const sessionStore = MongoStore.create({
+  mongoUrl: process.env.MONGODB_URI,
+  touchAfter: 24 * 3600, // lazy session update (in seconds)
+  mongoOptions: {
+    serverSelectionTimeoutMS: 5000,
+  },
+});
+
+// Handle session store errors
+sessionStore.on("error", function (error) {
+  console.error("Session store error:", error);
+});
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "your_session_secret_key",
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI,
-      touchAfter: 24 * 3600, // lazy session update (in seconds)
-    }),
+    store: sessionStore,
     cookie: {
       secure:
         process.env.NODE_ENV === "production" &&
@@ -108,6 +118,60 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to PCB Automotions API." });
 });
 
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  const mongoose = require("mongoose");
+  const os = require("os");
+
+  // Get network interfaces to show server IP
+  const networkInterfaces = os.networkInterfaces();
+  const ips = [];
+  Object.keys(networkInterfaces).forEach((interfaceName) => {
+    networkInterfaces[interfaceName].forEach((iface) => {
+      if (iface.family === "IPv4" && !iface.internal) {
+        ips.push(iface.address);
+      }
+    });
+  });
+
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    server: {
+      hostname: os.hostname(),
+      platform: os.platform(),
+      ips: ips.length > 0 ? ips : ["Unable to detect - check server logs"],
+    },
+    mongodb: {
+      connected: mongoose.connection.readyState === 1,
+      state: mongoose.connection.readyState,
+      stateDescription:
+        ["disconnected", "connected", "connecting", "disconnecting"][
+          mongoose.connection.readyState
+        ] || "unknown",
+      host: mongoose.connection.host || "not connected",
+      name: mongoose.connection.name || "not connected",
+    },
+    environment: {
+      nodeEnv: process.env.NODE_ENV,
+      hasMongodbUri: !!process.env.MONGODB_URI,
+      mongodbUriPrefix: process.env.MONGODB_URI?.substring(0, 20) + "...",
+      hasSessionSecret: !!process.env.SESSION_SECRET,
+      hasFrontendUrl: !!process.env.FRONTEND_URL,
+      cookieSecure: process.env.COOKIE_SECURE,
+    },
+    session: {
+      cookieSettings: {
+        secure:
+          process.env.NODE_ENV === "production" &&
+          process.env.COOKIE_SECURE !== "false",
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      },
+    },
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -120,4 +184,28 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log("\n=== Environment Configuration ===");
+  console.log("NODE_ENV:", process.env.NODE_ENV || "not set");
+  console.log("MONGODB_URI:", process.env.MONGODB_URI ? "✓ Set" : "✗ MISSING");
+  console.log(
+    "SESSION_SECRET:",
+    process.env.SESSION_SECRET ? "✓ Set" : "✗ MISSING",
+  );
+  console.log("FRONTEND_URL:", process.env.FRONTEND_URL || "not set");
+  console.log(
+    "COOKIE_SECURE:",
+    process.env.COOKIE_SECURE || "not set (will default based on NODE_ENV)",
+  );
+  console.log("=================================\n");
+
+  if (!process.env.SESSION_SECRET) {
+    console.warn(
+      "⚠️  WARNING: SESSION_SECRET not set! Using default (not secure for production)",
+    );
+  }
+  if (!process.env.MONGODB_URI) {
+    console.error(
+      "❌ ERROR: MONGODB_URI not set! Database connection will fail.",
+    );
+  }
 });
