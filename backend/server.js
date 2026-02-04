@@ -88,6 +88,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
+    name: "connect.sid", // Explicit session cookie name
     cookie: {
       secure:
         process.env.NODE_ENV === "production" &&
@@ -95,18 +96,37 @@ app.use(
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // 'none' for cross-origin in production with HTTPS
+      domain: process.env.COOKIE_DOMAIN || undefined, // e.g., '.yourdomain.com' for subdomains
     },
   }),
 );
 
-// Debug middleware - log session info in development
-if (process.env.NODE_ENV === "development") {
-  app.use((req, res, next) => {
+// Debug middleware - log session info
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === "development") {
     console.log("Session ID:", req.sessionID);
-    // console.log("Session Data:", req.session);
-    next();
-  });
-}
+    console.log("Session userId:", req.session?.userId);
+  }
+
+  // Log session issues in production
+  if (process.env.NODE_ENV === "production") {
+    // Log when there's no session but we're hitting protected routes
+    if (
+      !req.session?.userId &&
+      req.path.startsWith("/api/") &&
+      req.path !== "/api/login" &&
+      req.path !== "/api/health"
+    ) {
+      console.warn(
+        `No session for ${req.method} ${req.path} - Session ID: ${req.sessionID}`,
+      );
+      console.warn(`Cookie header:`, req.headers.cookie);
+      console.warn(`Origin:`, req.headers.origin);
+    }
+  }
+
+  next();
+});
 
 // Routes
 app.use("/api", authRoutes);
@@ -167,7 +187,34 @@ app.get("/api/health", (req, res) => {
           process.env.COOKIE_SECURE !== "false",
         httpOnly: true,
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        domain: process.env.COOKIE_DOMAIN || undefined,
       },
+    },
+  });
+});
+
+// Session test endpoint - helps debug session issues
+app.get("/api/session-test", (req, res) => {
+  const hasSession = !!req.session;
+  const sessionData = req.session || {};
+
+  // Set a test value if it doesn't exist
+  if (req.query.set === "true") {
+    req.session.testValue = Date.now();
+    req.session.testCounter = (req.session.testCounter || 0) + 1;
+  }
+
+  res.json({
+    status: "ok",
+    hasSession,
+    sessionID: req.sessionID,
+    isAuthenticated: !!req.session?.userId,
+    userId: req.session?.userId || null,
+    testValue: sessionData.testValue || null,
+    testCounter: sessionData.testCounter || 0,
+    cookie: req.headers.cookie || null,
+    instructions: {
+      test: "Visit /api/session-test?set=true to set session data, then refresh to see if it persists",
     },
   });
 });

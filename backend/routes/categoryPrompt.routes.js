@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/User.model");
-const verifySession = require("../middleware/auth.middleware");
+const verifyToken = require("../middleware/auth.middleware");
 const {
   DEFAULT_CATEGORY_PROMPT_1,
   DEFAULT_CATEGORY_PROMPT_2,
@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 // Get Category Prompts
-router.get("/", verifySession, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -35,7 +35,7 @@ router.get("/", verifySession, async (req, res) => {
 });
 
 // Save Category Prompts
-router.post("/", verifySession, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
     const { categoryPrompt1, categoryPrompt2 } = req.body;
 
@@ -45,12 +45,10 @@ router.post("/", verifySession, async (req, res) => {
       !categoryPrompt1.trim() ||
       !categoryPrompt2.trim()
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Category prompts data is incomplete. Both prompts are required.",
-        });
+      return res.status(400).json({
+        message:
+          "Category prompts data is incomplete. Both prompts are required.",
+      });
     }
 
     const user = await User.findById(req.userId);
@@ -75,7 +73,7 @@ router.post("/", verifySession, async (req, res) => {
 });
 
 // Reset Category Prompts to Default (both)
-router.delete("/", verifySession, async (req, res) => {
+router.delete("/", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -100,7 +98,7 @@ router.delete("/", verifySession, async (req, res) => {
 });
 
 // Reset Category Prompt 1 Only
-router.delete("/prompt1", verifySession, async (req, res) => {
+router.delete("/prompt1", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -130,7 +128,7 @@ router.delete("/prompt1", verifySession, async (req, res) => {
 });
 
 // Reset Category Prompt 2 Only
-router.delete("/prompt2", verifySession, async (req, res) => {
+router.delete("/prompt2", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 

@@ -1,9 +1,19 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
-const verifySession = require("../middleware/auth.middleware");
+const verifyToken = require("../middleware/auth.middleware");
 
 const router = express.Router();
+
+// Generate JWT token
+const generateToken = (userId, userRole, userEmail) => {
+  return jwt.sign(
+    { userId, userRole, userEmail },
+    process.env.JWT_SECRET || "fallback_secret_change_in_production",
+    { expiresIn: "24h" },
+  );
+};
 
 // Login Route
 router.post("/login", async (req, res) => {
@@ -43,36 +53,19 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid password." });
     }
 
-    console.log("Password valid, creating session...");
+    console.log("Password valid, generating token...");
 
-    // Set session
-    req.session.userId = user._id.toString();
-    req.session.userRole = user.role;
-    req.session.userEmail = user.email;
+    // Generate JWT token
+    const token = generateToken(user._id.toString(), user.role, user.email);
 
-    // Explicitly save session before sending response
-    req.session.save((err) => {
-      if (err) {
-        console.error("Session save error:", err);
-        console.error(
-          "Session save error details:",
-          JSON.stringify(err, null, 2),
-        );
-        return res.status(500).json({
-          message: "Failed to create session.",
-          error:
-            process.env.NODE_ENV === "development" ? err.message : undefined,
-        });
-      }
-
-      console.log("Login successful for:", email);
-      res.status(200).json({
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        message: "Login successful",
-      });
+    console.log("Login successful for:", email);
+    res.status(200).json({
+      token,
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      message: "Login successful",
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -85,21 +78,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Logout Route
+// Logout Route (token-based, client-side only)
 router.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ message: "Could not log out, please try again." });
-    }
-    res.clearCookie("connect.sid");
-    res.status(200).json({ message: "Logout successful" });
-  });
+  // With JWT, logout is handled client-side by removing the token
+  res.status(200).json({ message: "Logout successful" });
 });
 
 // Get current user
-router.get("/me", verifySession, async (req, res) => {
+router.get("/me", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select("-password");
 
@@ -115,7 +101,7 @@ router.get("/me", verifySession, async (req, res) => {
 });
 
 // Change Password Route
-router.post("/change-password", verifySession, async (req, res) => {
+router.post("/change-password", verifyToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
 

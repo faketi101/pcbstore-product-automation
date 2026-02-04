@@ -3,8 +3,10 @@ import config from "../config/api.config";
 const API_URL = config.API_URL;
 
 const getHeaders = () => {
+  const token = localStorage.getItem("token");
   return {
     "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
   };
 };
 
@@ -13,6 +15,7 @@ const handleResponse = async (response) => {
     if (response.status === 401) {
       // Clear user data and redirect to login
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
@@ -26,7 +29,6 @@ const handleResponse = async (response) => {
 const login = async (email, password) => {
   const response = await fetch(`${API_URL}/login`, {
     method: "POST",
-    credentials: "include", // Important: send cookies
     headers: {
       "Content-Type": "application/json",
     },
@@ -34,8 +36,10 @@ const login = async (email, password) => {
   });
 
   const data = await handleResponse(response);
-  // Store user info (not token) in localStorage for UI purposes
-  if (data.id) {
+
+  // Store token and user info
+  if (data.token) {
+    localStorage.setItem("token", data.token);
     localStorage.setItem(
       "user",
       JSON.stringify({
@@ -53,13 +57,13 @@ const logout = async () => {
   try {
     await fetch(`${API_URL}/logout`, {
       method: "POST",
-      credentials: "include", // Important: send cookies
       headers: getHeaders(),
     });
   } catch (error) {
     console.error("Logout error:", error);
   } finally {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   }
 };
 
@@ -70,7 +74,6 @@ const getCurrentUser = () => {
 const getPrompts = async () => {
   const response = await fetch(`${API_URL}/prompts`, {
     method: "GET",
-    credentials: "include", // Important: send cookies
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -79,7 +82,6 @@ const getPrompts = async () => {
 const savePrompts = async (prompts) => {
   const response = await fetch(`${API_URL}/prompts`, {
     method: "POST",
-    credentials: "include", // Important: send cookies
     headers: getHeaders(),
     body: JSON.stringify(prompts),
   });
@@ -89,7 +91,6 @@ const savePrompts = async (prompts) => {
 const resetPrompts = async () => {
   const response = await fetch(`${API_URL}/prompts`, {
     method: "DELETE",
-    credentials: "include", // Important: send cookies
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -98,7 +99,6 @@ const resetPrompts = async () => {
 const resetMainPrompt = async () => {
   const response = await fetch(`${API_URL}/prompts/main`, {
     method: "DELETE",
-    credentials: "include", // Important: send cookies
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -107,7 +107,6 @@ const resetMainPrompt = async () => {
 const resetStaticPrompt = async () => {
   const response = await fetch(`${API_URL}/prompts/static`, {
     method: "DELETE",
-    credentials: "include", // Important: send cookies
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -117,7 +116,6 @@ const resetStaticPrompt = async () => {
 const getCategoryPrompts = async () => {
   const response = await fetch(`${API_URL}/category-prompts`, {
     method: "GET",
-    credentials: "include",
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -126,7 +124,6 @@ const getCategoryPrompts = async () => {
 const saveCategoryPrompts = async (prompts) => {
   const response = await fetch(`${API_URL}/category-prompts`, {
     method: "POST",
-    credentials: "include",
     headers: getHeaders(),
     body: JSON.stringify(prompts),
   });
@@ -136,7 +133,6 @@ const saveCategoryPrompts = async (prompts) => {
 const resetCategoryPrompts = async () => {
   const response = await fetch(`${API_URL}/category-prompts`, {
     method: "DELETE",
-    credentials: "include",
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -145,7 +141,6 @@ const resetCategoryPrompts = async () => {
 const resetCategoryPrompt1 = async () => {
   const response = await fetch(`${API_URL}/category-prompts/prompt1`, {
     method: "DELETE",
-    credentials: "include",
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -154,7 +149,6 @@ const resetCategoryPrompt1 = async () => {
 const resetCategoryPrompt2 = async () => {
   const response = await fetch(`${API_URL}/category-prompts/prompt2`, {
     method: "DELETE",
-    credentials: "include",
     headers: getHeaders(),
   });
   return handleResponse(response);
@@ -163,7 +157,6 @@ const resetCategoryPrompt2 = async () => {
 const changePassword = async (currentPassword, newPassword) => {
   const response = await fetch(`${API_URL}/change-password`, {
     method: "POST",
-    credentials: "include", // Important: send cookies
     headers: getHeaders(),
     body: JSON.stringify({ currentPassword, newPassword }),
   });

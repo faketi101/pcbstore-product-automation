@@ -1,7 +1,7 @@
 const express = require("express");
 const { v4: uuidv4 } = require("uuid");
 const User = require("../models/User.model");
-const verifySession = require("../middleware/auth.middleware");
+const verifyToken = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
@@ -165,7 +165,7 @@ const aggregateDailyReport = (hourlyReports) => {
 ---------------------------------------------- */
 
 // GET hourly reports with optional filters
-router.get("/hourly", verifySession, async (req, res) => {
+router.get("/hourly", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found." });
@@ -199,7 +199,7 @@ router.get("/hourly", verifySession, async (req, res) => {
 });
 
 // POST hourly
-router.post("/hourly", verifySession, async (req, res) => {
+router.post("/hourly", verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
     const { data, date, time } = req.body;
@@ -237,7 +237,7 @@ router.post("/hourly", verifySession, async (req, res) => {
 });
 
 // GET daily by date
-router.get("/daily/:date", verifySession, async (req, res) => {
+router.get("/daily/:date", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found." });
@@ -270,7 +270,7 @@ router.get("/daily/:date", verifySession, async (req, res) => {
 });
 
 // GET multiple daily reports with date range
-router.get("/daily", verifySession, async (req, res) => {
+router.get("/daily", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found." });
@@ -314,7 +314,7 @@ router.get("/daily", verifySession, async (req, res) => {
 });
 
 // UPDATE hourly report
-router.put("/hourly/:id", verifySession, async (req, res) => {
+router.put("/hourly/:id", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found." });
@@ -354,7 +354,7 @@ router.put("/hourly/:id", verifySession, async (req, res) => {
 });
 
 // DELETE hourly report
-router.delete("/hourly/:id", verifySession, async (req, res) => {
+router.delete("/hourly/:id", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ message: "User not found." });

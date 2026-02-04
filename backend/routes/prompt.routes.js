@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/User.model");
-const verifySession = require("../middleware/auth.middleware");
+const verifyToken = require("../middleware/auth.middleware");
 const {
   DEFAULT_STATIC_PROMPT,
   DEFAULT_MAIN_PROMPT_TEMPLATE,
@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 // Get Prompts
-router.get("/", verifySession, async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -27,7 +27,7 @@ router.get("/", verifySession, async (req, res) => {
 });
 
 // Save Prompts
-router.post("/", verifySession, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   try {
     const { staticPrompt, mainPromptTemplate } = req.body;
 
@@ -55,7 +55,7 @@ router.post("/", verifySession, async (req, res) => {
 });
 
 // Reset Prompts to Default (both)
-router.delete("/", verifySession, async (req, res) => {
+router.delete("/", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -78,7 +78,7 @@ router.delete("/", verifySession, async (req, res) => {
 });
 
 // Reset Main Prompt Only
-router.delete("/main", verifySession, async (req, res) => {
+router.delete("/main", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 
@@ -106,7 +106,7 @@ router.delete("/main", verifySession, async (req, res) => {
 });
 
 // Reset Static Prompt Only
-router.delete("/static", verifySession, async (req, res) => {
+router.delete("/static", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
 

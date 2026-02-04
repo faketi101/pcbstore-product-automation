@@ -3,8 +3,32 @@ import config from "../config/api.config";
 
 const API_URL = `${config.API_URL}/reports`;
 
-// Configure axios to send cookies with requests
-axios.defaults.withCredentials = true;
+// Configure axios to send authorization token
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+// Handle 401 errors
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
 
 const reportService = {
   // Create new hourly report
