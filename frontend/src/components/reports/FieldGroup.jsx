@@ -1,4 +1,4 @@
-const FieldGroup = ({ label, fields, values, onChange }) => {
+const FieldGroup = ({ label, fields, values = {}, onChange }) => {
   const getFieldColor = (field) => {
     if (field === "generated")
       return "border-green-500 focus:ring-green-500 focus:border-green-500";
@@ -29,7 +29,7 @@ const FieldGroup = ({ label, fields, values, onChange }) => {
             </label>
             <input
               type="number"
-              value={values[field]}
+              value={values[field] ?? 0}
               onChange={(e) => onChange(field, e.target.value)}
               min="0"
               className={`block w-full px-3 py-2 border-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 sm:text-sm transition-all ${getFieldColor(field)}`}

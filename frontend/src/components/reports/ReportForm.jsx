@@ -23,9 +23,26 @@ const ReportForm = ({ editingReport, setEditingReport, onSuccess }) => {
       return {
         date: editingReport.date,
         time: editingReport.time,
-        ...data,
+        description: data.description || { generated: 0, added: 0 },
+        faq: data.faq || { generated: 0, added: 0 },
         keyFeatures: keyFeatures,
+        specifications: data.specifications || { generated: 0, added: 0 },
+        metaTitleDescription: data.metaTitleDescription || {
+          generated: 0,
+          added: 0,
+        },
+        titleFixed: data.titleFixed || { fixed: 0, added: 0 },
+        imageRenamed: data.imageRenamed || { fixed: 0 },
+        productReCheck: data.productReCheck || { check: 0, fixed: 0 },
+        category: data.category || { added: 0 },
+        attributes: data.attributes || { added: 0 },
+        deliveryCharge: data.deliveryCharge || { added: 0 },
+        warranty: data.warranty || { added: 0 },
+        warrantyClaimReasons: data.warrantyClaimReasons || { added: 0 },
+        brand: data.brand || { added: 0 },
+        price: data.price || { added: 0 },
         internalLink: data.internalLink || { added: 0 },
+        customFields: data.customFields || [],
       };
     }
 

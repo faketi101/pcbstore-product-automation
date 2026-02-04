@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("combined"));
 }
 
-// CORS configuration - allow multiple origins for local network access
+// CORS configuration - allow multiple origins for local network access and cloud deployment
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
@@ -33,18 +33,31 @@ const allowedOrigins = [
   // 'http://192.168.1.100:5173',
 ].filter(Boolean);
 
+// Split multiple origins from FRONTEND_URL if provided as comma-separated
+if (process.env.FRONTEND_URL && process.env.FRONTEND_URL.includes(",")) {
+  const extraOrigins = process.env.FRONTEND_URL.split(",").map((url) =>
+    url.trim(),
+  );
+  allowedOrigins.push(...extraOrigins);
+}
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl)
+      // Allow requests with no origin (like mobile apps, curl, or Postman)
       if (!origin) return callback(null, true);
 
-      if (
-        allowedOrigins.indexOf(origin) !== -1 ||
-        process.env.NODE_ENV === "development"
-      ) {
+      // In development, allow all origins
+      if (process.env.NODE_ENV === "development") {
+        return callback(null, true);
+      }
+
+      // In production, check against allowed origins
+      if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.warn(`CORS blocked origin: ${origin}`);
+        console.log(`Allowed origins:`, allowedOrigins);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -66,10 +79,12 @@ app.use(
       touchAfter: 24 * 3600, // lazy session update (in seconds)
     }),
     cookie: {
-      secure: process.env.NODE_ENV === "production", // requires HTTPS in production
+      secure:
+        process.env.NODE_ENV === "production" &&
+        process.env.COOKIE_SECURE !== "false", // requires HTTPS in production
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours (still expires on browser close if browser supports it)
-      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // 'none' for cross-origin in production with HTTPS
     },
   }),
 );
@@ -102,22 +117,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const HOST = process.env.HOST || "0.0.0.0"; // Listen on all network interfaces
-
-app.listen(PORT, HOST, () => {
-  console.log(
-    `Server is running on http://${HOST}:${PORT} in ${process.env.NODE_ENV || "development"} mode.`,
-  );
-  console.log(`Local: http://localhost:${PORT}`);
-
-  // Get local network IP
-  const os = require("os");
-  const networkInterfaces = os.networkInterfaces();
-  Object.keys(networkInterfaces).forEach((interfaceName) => {
-    networkInterfaces[interfaceName].forEach((iface) => {
-      if (iface.family === "IPv4" && !iface.internal) {
-        console.log(`Network: http://${iface.address}:${PORT}`);
-      }
-    });
-  });
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });
