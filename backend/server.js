@@ -8,6 +8,7 @@ const morgan = require("morgan");
 const connectDB = require("./config/database");
 const authRoutes = require("./routes/auth.routes");
 const promptRoutes = require("./routes/prompt.routes");
+const categoryPromptRoutes = require("./routes/categoryPrompt.routes");
 const reportRoutes = require("./routes/report.routes");
 
 const app = express();
@@ -85,6 +86,7 @@ if (process.env.NODE_ENV === "development") {
 // Routes
 app.use("/api", authRoutes);
 app.use("/api/prompts", promptRoutes);
+app.use("/api/category-prompts", categoryPromptRoutes);
 app.use("/api/reports", reportRoutes);
 
 app.get("/", (req, res) => {

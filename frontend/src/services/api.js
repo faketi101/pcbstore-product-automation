@@ -113,6 +113,53 @@ const resetStaticPrompt = async () => {
   return handleResponse(response);
 };
 
+// Category Prompts API
+const getCategoryPrompts = async () => {
+  const response = await fetch(`${API_URL}/category-prompts`, {
+    method: "GET",
+    credentials: "include",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
+const saveCategoryPrompts = async (prompts) => {
+  const response = await fetch(`${API_URL}/category-prompts`, {
+    method: "POST",
+    credentials: "include",
+    headers: getHeaders(),
+    body: JSON.stringify(prompts),
+  });
+  return handleResponse(response);
+};
+
+const resetCategoryPrompts = async () => {
+  const response = await fetch(`${API_URL}/category-prompts`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
+const resetCategoryPrompt1 = async () => {
+  const response = await fetch(`${API_URL}/category-prompts/prompt1`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
+const resetCategoryPrompt2 = async () => {
+  const response = await fetch(`${API_URL}/category-prompts/prompt2`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: getHeaders(),
+  });
+  return handleResponse(response);
+};
+
 const changePassword = async (currentPassword, newPassword) => {
   const response = await fetch(`${API_URL}/change-password`, {
     method: "POST",
@@ -132,6 +179,11 @@ const authService = {
   resetPrompts,
   resetMainPrompt,
   resetStaticPrompt,
+  getCategoryPrompts,
+  saveCategoryPrompts,
+  resetCategoryPrompts,
+  resetCategoryPrompt1,
+  resetCategoryPrompt2,
   changePassword,
 };
 

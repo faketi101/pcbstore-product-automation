@@ -10,6 +10,7 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { useContext } from "react";
 import Home from "./pages/Home";
 import ProductPrompt from "./pages/ProductPrompt";
+import CategoryPrompt from "./pages/CategoryPrompt";
 import Reports from "./pages/Reports";
 import Login from "./components/Login";
 import Navigation from "./components/Navigation";
@@ -51,6 +52,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ProductPrompt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/category-prompt"
+            element={
+              <PrivateRoute>
+                <CategoryPrompt />
               </PrivateRoute>
             }
           />

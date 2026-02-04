@@ -47,10 +47,13 @@ const ReportHistory = ({ onEdit, lastEditedReportId, onClearLastEdited }) => {
 
   // new codes
   const formatParts = (parts) => {
-    return Object.entries(parts)
-      .filter(([_, value]) => value > 0)
-      .map(([key, value]) => `${capitalize(key)} ${value}`)
-      .join(", ");
+    return (
+      Object.entries(parts)
+        // eslint-disable-next-line no-unused-vars
+        .filter(([_, value]) => value > 0)
+        .map(([key, value]) => `${capitalize(key)} ${value}`)
+        .join(", ")
+    );
   };
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);

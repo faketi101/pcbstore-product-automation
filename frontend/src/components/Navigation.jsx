@@ -44,6 +44,16 @@ const Navigation = () => {
                 Product Prompt
               </Link>
               <Link
+                to="/category-prompt"
+                className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  isActive("/category-prompt")
+                    ? "bg-emerald-100 text-emerald-700 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                Category Prompt
+              </Link>
+              <Link
                 to="/reports"
                 className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
                   isActive("/reports")
